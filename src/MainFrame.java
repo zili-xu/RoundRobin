@@ -45,15 +45,20 @@ public class MainFrame {
         bStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (allQue.size()==0) {
-                    JOptionPane.showMessageDialog(null, "请重新选择文件!", "提示", JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-                if (boolTTime()) { // 判断时间片
-                    if (flag) {
-                        initQue();
+                if (flag) {
+                    if (allQue.size()==0) {
+                        JOptionPane.showMessageDialog(null, "请重新选择文件!", "提示", JOptionPane.INFORMATION_MESSAGE);
+                        return;
                     }
-                    startRun();
+                    if (boolTTime()) { // 判断时间片
+                        initQue();
+//                        if (flag) {
+//                            initQue();
+//                        }
+                        startRun();
+                    }
+                }else {
+                    resume();
                 }
             }
         });
@@ -63,9 +68,34 @@ public class MainFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 bStart.setText("继续调度");
-                blinker = null;
+
+                lInfo.setText("调度已停止/(ㄒoㄒ)/~~");
+                saveLog("调度已停止\n");
+
+                // 暂停
+                suspend();
+//                blinker = null;
             }
         });
+    }
+
+    private void resume() {
+        synchronized (blinker) {
+//            blinker.notify();
+            blinker.resume();
+        }
+    }
+
+    private void suspend() {
+        synchronized (blinker) {
+//            try {
+//                blinker.wait();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
+            blinker.suspend();
+        }
     }
 
     private void saveLog(String str) {
@@ -113,8 +143,8 @@ public class MainFrame {
             public void run() {
                 saveLog("------正在进行调度-------");
                 lInfo.setText("------正在进行调度-------");
-                while (blinker != null) {
-//                while (true) {
+//                while (blinker != null) {
+                while (true) {
                     try {
                         int a = runReady();
                         if (a != -1) {
@@ -158,15 +188,20 @@ public class MainFrame {
                         e.printStackTrace();
                     }
                 }
-                if (blinker != null) {
-                    bStart.setText("开始调度");
-                    tCur.setText("");
-                    lInfo.setText("调度已完成(*^_^*)");
-                    saveLog("调度已完成");
-                } else {
-                    lInfo.setText("调度已停止/(ㄒoㄒ)/~~");
-                    saveLog("调度已停止");
-                }
+//                if (blinker != null) {
+//                    bStart.setText("开始调度");
+//                    tCur.setText("");
+//                    lInfo.setText("调度已完成(*^_^*)");
+//                    saveLog("调度已完成");
+//                } else {
+//                    lInfo.setText("调度已停止/(ㄒoㄒ)/~~");
+//                    saveLog("调度已停止");
+//                }
+
+                bStart.setText("开始调度");
+                tCur.setText("");
+                lInfo.setText("调度已完成(*^_^*)");
+                saveLog("调度已完成");
             }
 
 
